@@ -16,7 +16,14 @@ namespace TopShelfDemo
     {
         public static void Main(string[] args)
         {
-            var container = CreateContainer();
+            XmlConfigurator.Configure(new FileInfo("Log4Net.config"));
+
+            //var container = CreateContainer();
+            //IServer service = container.Resolve<IServer>();
+
+            //IServer service = new MyService2();
+
+            IService service = MyService3.Instance;
 
             var exitCode =  HostFactory.Run(hostConfigurator=> {
                 hostConfigurator.UseLog4Net();
@@ -24,8 +31,8 @@ namespace TopShelfDemo
                 hostConfigurator.SetDisplayName("DisplayName");
                 hostConfigurator.SetServiceName("ServiceName");
 
-                hostConfigurator.Service<MyService1>(serviceConfigurator=> {
-                    serviceConfigurator.ConstructUsing(p => container.Resolve<MyService1>());
+                hostConfigurator.Service<IService>(serviceConfigurator=> {
+                    serviceConfigurator.ConstructUsing(p => service);
                     serviceConfigurator.WhenStarted(p => p.Start());
                     serviceConfigurator.WhenStopped(p => p.Stop());
                 }).RunAsLocalSystem();
@@ -34,11 +41,10 @@ namespace TopShelfDemo
 
         public static IUnityContainer CreateContainer()
         {
-            XmlConfigurator.Configure(new FileInfo("Log4Net.config"));
-
             var container = new UnityContainer();
             container.AddNewExtension<Log4NetExtension>();
-            container.RegisterSingleton<MyService1>();
+            container.RegisterSingleton(typeof(IService), typeof(MyService1));
+            //container.RegisterSingleton(typeof(IServer), typeof(MyService2), "2");
 
             return container;
         }
