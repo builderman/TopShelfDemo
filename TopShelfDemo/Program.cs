@@ -16,6 +16,7 @@ namespace TopShelfDemo
     {
         public static void Main(string[] args)
         {
+            //TODO:
             XmlConfigurator.Configure(new FileInfo("Log4Net.config"));
 
             //var container = CreateContainer();
